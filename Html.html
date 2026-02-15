@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Health Management</title>
+    <link rel="stylesheet" href="Css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="background"> <img src="https://i.ibb.co/Qv7pTg7y/1.jpg" alt="Barangay Kauswagan Background"></div>
+    <div class="container">
+        <!--LOGIN-->
+        <div class="form-box login" id="loginBox">
+            <form action="#">
+                <h1>Login</h1>
+                <div class="input-box">
+                    <input type="text" id="usernameInput" placeholder="Email" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="passwordInput" placeholder="Password" required>
+                    <i class="fa-solid fa-lock"></i>
+                    <div class="showPassword">
+                        <i id="togglePassword" class="fa-solid fa-eye"></i>
+                    </div>
+                </div>
+                <div class="select-role">
+                    <select class="select-role" id="role" required>
+                        <option value="">Select Role</option>
+                        <option value="patient">Patient</option>
+                        <option value="staff">Staff</option>
+                        <option value="doctor">Doctor</option>
+                    </select>
+                </div>
+                <div class="forgot-link">
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+        </div>
+        </form>
+
+        <!--REGISTER-->
+        <div class="form-box register" id="registerBox">
+            <form action="#">
+                <h1>Register</h1>
+                <div class="input-box1">
+                    <input type="text" id="firstnameInput" placeholder="First Name" required>
+                </div>
+                <div class="input-box1">
+                    <input type="text" id="lastanameInput" placeholder="Last Name" required>
+                </div>
+                <div class="input-box1">
+                    <input type="text" id="emailInput" placeholder="Email" required>
+                </div>
+                <div class="input-box1">
+                    <input type="text" id="usernameInput" placeholder="Username" required>
+                </div>
+                <div class="input-box1">
+                    <input type="text" id="passwordInput" placeholder="Password" required>
+                    <div class="input-box1">
+                        <input type="password" id="confirmpasswordInput" placeholder="Confirm Password" required>
+                        <div class="showPassword_1">
+                            <i id="togglePassword_1" class="fa-solid fa-eye"></i>
+                        </div>
+                    </div>
+
+                    <div class="select-role1">
+                        <select class="select-role1" id="role" required>
+                            <option value="">Select Role</option>
+                            <option value="patient">Patient</option>
+                            <option value="staff">Staff</option>
+                            <option value="doctor">Doctor</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn" id="registerBtn">Register</button>
+                </div>
+            </form>
+        </div>
+
+        <!--TOGGLE BOX-->
+        <div class="toggle-box" id="toggle-box">
+
+            <!--TOGGLE BOX LEFT-->
+            <div class="toggle-panel toggle-left">
+                <h1>Hello, Welcome!</h1>
+                <p>Don't have an account?</p>
+                <button type="button" class="btn" id="register-btn">Register</button>
+            </div>
+
+            <!--TOGGLE BOX RIGHT-->
+            <div class="toggle-panel toggle-right">
+                <h1>Welcome Back!</h1>
+                <p>Already have an account?</p>
+                <button type="button" class="btn" id="login-btn">Login</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--HOMEPAGE-->
+    <div class="home-page" id="homePage" style="display: none;">
+        <aside class="home-sidebar">
+            <div class="home-logo-circle"><img src="https://i.ibb.co/vxLybbws/Health-Management-System-LOGO.png"
+                    alt="Health Management System Logo"></div>
+            <nav>
+                <div class="home-nav-item active"><i class="fa-solid fa-house"></i> Home</div>
+                <div class="home-nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</div>
+                <div class="home-nav-item"><i class="fa-solid fa-calendar-days"></i> Appointment</div>
+                <div class="home-nav-item"><i class="fa-solid fa-gear"></i> Settings</div>
+            </nav>
+        </aside>
+
+        <main class="home-main">
+            <header class="home-top-bar">
+                <h1>Welcome Back!</h1>
+            </header>
+            <section class="home-content-row">
+                <div class="home-card">
+                    <h2>About Us</h2>
+                    <div class="home-img-placeholder"></div>
+                </div>
+                <div class="home-card">
+                    <h2>About Us</h2>
+                    <div class="home-img-placeholder"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!--DASHBOARD-->
+    <div class="dashboard-page" id="dashboardPage" style="display: none;">
+        <aside class="home-sidebar">
+            <div class="home-logo-circle"><img src="https://i.ibb.co/vxLybbws/Health-Management-System-LOGO.png"
+                    alt="Health Management System Logo"></div>
+            <nav>
+                <div class="home-nav-item" id="homeBtnDash"><i class="fa-solid fa-house"></i> Home</div>
+                <div class="home-nav-item active"><i class="fa-solid fa-chart-line"></i> Dashboard</div>
+                <div class="home-nav-dashboard-holder_1">
+                    <span id="patient-dashboard"><i class="fa-solid fa-bed"></i></i>Patient Dashboard</span>
+                </div>
+                <div class="home-nav-dashboard-holder_2">
+                    <span id="doctor-dashboard"><i class="fa-solid fa-user-doctor"></i>Doctor Dashboard</span>
+                </div>
+                <div class="home-nav-item" id="appointmentBtnDash"><i class="fa-solid fa-calendar-days"></i>Appointment
+                </div>
+                <div class="home-nav-item" id="settingsBtnDash"><i class="fa-solid fa-gear"></i> Settings</div>
+            </nav>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="dashboard-top-bar">
+                <h1>Dashboard</h1>
+            </header>
+
+            <section class="dashboard-stats-row">
+                <div class="dashboard-card">
+                    <h3>Total Appointment</h3>
+                    <div class="dashboard-card-placeholder"></div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Total Patient</h3>
+                    <div class="dashboard-card-placeholder"></div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Total Doctor</h3>
+                    <div class="dashboard-card-placeholder"></div>
+                </div>
+            </section>
+
+            <section class="dashboard-progress">
+                <h3>Total Progress</h3>
+                <div class="dashboard-progress-placeholder"></div>
+            </section>
+        </main>
+
+        <!--PATIENT DASHBOARD-->
+        <section class="patient-dashboard-page" id="patientdashboardPage" style="display: none;">
+            <main class="patient-dashboard-main">
+                <header class="patient-dashboard-top-bar">
+                    <h1>Patient Dashboard</h1>
+                </header>
+
+                <section class="patient-dashboard-progress">
+                    <h3>Total Patient</h3>
+                    <div class="patient-dashboard-progress-placeholder"></div>
+                </section>
+            </main>
+        </section>
+
+        <!--DOCTOR DASHBOARD-->
+        <section class="doctor-dashboard-page" id="doctordashboardPage" style="display: none;">
+            <main class="doctor-dashboard-main">
+                <header class="doctor-dashboard-top-bar">
+                    <h1>Doctor Dashboard</h1>
+                </header>
+
+                <section class="doctor-dashboard-progress">
+                    <h3>Total Doctor</h3>
+                    <div class="doctor-dashboard-progress-placeholder"></div>
+                </section>
+            </main>
+        </section>
+    </div>
+
+    <!--APPOINTMENT-->
+    <div class="appointment-page" id="appointmentPage" style="display: none;">
+        <aside class="home-sidebar">
+            <div class="home-logo-circle"><img src="https://i.ibb.co/vxLybbws/Health-Management-System-LOGO.png"
+                    alt="Health Management System Logo"></div>
+            <nav>
+                <div class="home-nav-item" id="homeBtnApp"><i class="fa-solid fa-house"></i> Home</div>
+                <div class="home-nav-item" id="dashBtnApp"><i class="fa-solid fa-chart-line"></i> Dashboard</div>
+                <div class="home-nav-item active"><i class="fa-solid fa-calendar-days"></i> Appointment</div>
+                <div class="home-nav-item"><i class="fa-solid fa-gear"></i> Settings</div>
+            </nav>
+        </aside>
+
+        <main class="appointment-main">
+            <header class="appointment-top-bar">
+                <h3>Appointments</h3>
+            </header>
+
+            <section class="appointment-action-row">
+                <button class="add-appointment-btn">+ Add Appointment</button>
+            </section>
+
+            <section class="appointment-content-row">
+                <div class="appointment-card">
+                    <h3>Total Patient</h3>
+                    <div class="appointment-card-placeholder"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!--SETTING-->
+    <div class="settings-page" id="settingsPage" style="display: none;">
+        <aside class="home-sidebar">
+            <div class="home-logo-circle"><img src="https://i.ibb.co/vxLybbws/Health-Management-System-LOGO.png"
+                    alt="Health Management System Logo"></div>
+            <nav>
+                <div class="home-nav-item" id="homeBtnSett"><i class="fa-solid fa-house"></i> Home</div>
+                <div class="home-nav-item" id="dashBtnSett"><i class="fa-solid fa-chart-line"></i> Dashboard</div>
+                <div class="home-nav-item" id="appBtnSett"><i class="fa-solid fa-calendar-days"></i> Appointment</div>
+                <div class="home-nav-item active"><i class="fa-solid fa-gear"></i> Settings</div>
+            </nav>
+        </aside>
+
+        <main class="settings-main">
+            <div class="settings-container">
+                <div class="profile-card">
+                    <div class="input-group">
+                        <label>Name</label>
+                        <input type="text" placeholder="Enter your name">
+                    </div>
+                    <div class="input-group">
+                        <label>Birthdate</label>
+                        <input type="date">
+                    </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="Example@gmail.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Patient ID</label>
+                        <input type="text" placeholder="P-000000" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>Contact #</label>
+                        <input type="tel" placeholder="09XX XXX XXX">
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn-secondary">Edit Profile</button>
+                        <button class="btn-primary">Apply Changes</button>
+                        <button class="btn-outline">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="Js.js"></script>
+    </div>
+</body>
+
+</html>
