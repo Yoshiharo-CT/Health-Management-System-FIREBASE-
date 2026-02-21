@@ -16,16 +16,20 @@
             <form action="#">
                 <h1>Login</h1>
                 <div class="input-box">
-                    <input type="text" id="usernameInput" placeholder="Email" required>
+                    <input type="email" id="usernameInput" placeholder="Email" required>
                     <i class="fa-solid fa-user"></i>
                 </div>
                 <div class="input-box">
-                    <input type="password" id="passwordInput" placeholder="Password" required>
+                    <input type="password" id="passwordInput" placeholder="Password"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 characters"
+                        required>
                     <i class="fa-solid fa-lock"></i>
                     <div class="showPassword">
-                        <i id="togglePassword" class="fa-solid fa-eye"></i>
+                        <i id="toggleLoginPassword" class="fa-solid fa-eye"></i>
                     </div>
                 </div>
+
                 <div class="select-role">
                     <select class="select-role" id="role" required>
                         <option value="">Select Role</option>
@@ -35,11 +39,18 @@
                     </select>
                 </div>
                 <div class="forgot-link">
-                    <a href="#">Forgot Password?</a>
+                    <a href="#" id="resetEmail">Forgot Password?</a>
+                </div>
+
+                <div class="securityForm">
+                    <label id="question">What is X + Y?</label><br>
+                    <input type="hidden" id="num1">
+                    <input type="hidden" id="num2">
+                    <input type="number" id="captcha-answer" required aria-labelledby="question">
                 </div>
                 <button type="submit" class="btn">Login</button>
+            </form>
         </div>
-        </form>
 
         <!--REGISTER-->
         <div class="form-box register" id="registerBox">
@@ -52,17 +63,23 @@
                     <input type="text" id="lastanameInput" placeholder="Last Name" required>
                 </div>
                 <div class="input-box1">
-                    <input type="text" id="emailInput" placeholder="Email" required>
+                    <input type="email" id="emailInput" placeholder="Email" required>
                 </div>
                 <div class="input-box1">
                     <input type="text" id="usernameInput" placeholder="Username" required>
                 </div>
                 <div class="input-box1">
-                    <input type="text" id="passwordInput" placeholder="Password" required>
+                    <input type="text" id="passwordInput" placeholder="Password"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 characters"
+                        required>
                     <div class="input-box1">
-                        <input type="password" id="confirmpasswordInput" placeholder="Confirm Password" required>
+                        <input type="password" id="confirmpasswordInput" placeholder="Confirm Password"
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                            title="Must contain at least one number, one uppercase letter, one lowercase letter, and at least 8 characters"
+                            required>
                         <div class="showPassword_1">
-                            <i id="togglePassword_1" class="fa-solid fa-eye"></i>
+                            <i id="toggleConfirmPassword" class="fa-solid fa-eye"></i>
                         </div>
                     </div>
 
@@ -98,6 +115,13 @@
         </div>
     </div>
 
+    <!--RESET PASSWORD FORM-->
+    <div class="password-reset-box" id="resetBox" style="display:none;">
+        <h2>Reset Password</h2>
+        <input type="email" id="resetEmailInput" placeholder="Enter your email" required>
+        <button id="resetBtn" class="btn">Send Reset Email</button>
+        <button id="cancelResetBtn" class="btn-outline">Cancel</button>
+    </div>
 
     <!--HOMEPAGE-->
     <div class="home-page" id="homePage" style="display: none;">
@@ -112,18 +136,100 @@
             </nav>
         </aside>
 
+        <!-- Main Content -->
         <main class="home-main">
             <header class="home-top-bar">
-                <h1>Welcome Back!</h1>
+                <h1 id="welcomeTitle">Welcome Back!</h1>
+                <p style="padding-left:5px;">Quick overview of your Health Management System</p>
             </header>
+
+            <!-- Action Cards -->
             <section class="home-content-row">
+
+                <!-- 1. Viewing Patient Records -->
                 <div class="home-card">
-                    <h2>About Us</h2>
-                    <div class="home-img-placeholder"></div>
+                    <h2>Viewing Patient Records</h2>
+                    <ul>
+                        <li>Open the Patient Dashboard from the sidebar.</li>
+                        <li>See all registered patients in the table.</li>
+                        <li>Columns displayed:
+                            <ul>
+                                <li><strong>First & Last Name:</strong> Patient identity</li>
+                                <li><strong>Email:</strong> Primary contact method</li>
+                                <li><strong>Date Recorded:</strong> Timestamp of when the patient was added</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <i class="fa-solid fa-users home-card-icon"></i>
                 </div>
+
+                <!-- 2. Adding a New Patient -->
                 <div class="home-card">
-                    <h2>About Us</h2>
-                    <div class="home-img-placeholder"></div>
+                    <h2>Adding a New Patient</h2>
+                    <ul>
+                        <li>Locate the input fields at the top left: First Name, Last Name, Email.</li>
+                        <li>Enter the patient's details in the boxes.</li>
+                        <li>Click the <strong>Add Patient</strong> button.</li>
+                        <li>The patient list updates automatically with the new entry.</li>
+                    </ul>
+                    <i class="fa-solid fa-user-plus home-card-icon"></i>
+                </div>
+
+                <!-- 3. Searching for a Patient -->
+                <div class="home-card">
+                    <h2>Searching for a Patient</h2>
+                    <ul>
+                        <li>Type the patient's name or search criteria into the Search Patient box.</li>
+                        <li>Click the <strong>Find</strong> button.</li>
+                        <li>The table filters to show only matching results.</li>
+                        <li>If no match is found, a message "No patient found" will appear.</li>
+                    </ul>
+                    <i class="fa-solid fa-magnifying-glass home-card-icon"></i>
+                </div>
+
+                <!-- 4. Resetting the View -->
+                <div class="home-card">
+                    <h2>Resetting the View</h2>
+                    <ul>
+                        <li>Click the <strong>Reset</strong> button to clear search filters.</li>
+                        <li>The full list of patients will be displayed again.</li>
+                    </ul>
+                    <i class="fa-solid fa-arrow-rotate-left home-card-icon"></i>
+                </div>
+
+                <!-- 5. Viewing Appointments (Patient-Friendly) -->
+                <div class="home-card">
+                    <h2>Appointments</h2>
+                    <ul>
+                        <li>View your scheduled appointments on the <strong>Appointment</strong> page.</li>
+                        <li>Check the date, time, and assigned doctor for each visit.</li>
+                        <li>Patients can track upcoming visits easily through the dashboard.</li>
+                        <li><em>Staff and Admin:</em> You can also add new appointments for patients here.</li>
+                    </ul>
+                    <i class="fa-solid fa-calendar-check home-card-icon"></i>
+                </div>
+
+                <!-- 6. Doctors Directory (Patient-Friendly) -->
+                <div class="home-card">
+                    <h2>Doctors Directory</h2>
+                    <ul>
+                        <li>See the list of available doctors in the <strong>Doctor Dashboard</strong>.</li>
+                        <li>Patients can check doctor names, specialties, and contact info for appointments.</li>
+                        <li><em>Staff and Admin:</em> Add, update, or remove doctor profiles as needed.</li>
+                        <li>Helps you choose the right doctor for your needs.</li>
+                    </ul>
+                    <i class="fa-solid fa-user-doctor home-card-icon"></i>
+                </div>
+
+                <!-- 7. System Settings -->
+                <div class="home-card">
+                    <h2>System Settings</h2>
+                    <ul>
+                        <li>Go to the <strong>Settings</strong> page from the sidebar.</li>
+                        <li>Edit profile information, update contact details, or manage preferences.</li>
+                        <li>Logout securely using the <strong>Logout</strong> button.</li>
+                    </ul>
+                    <i class="fa-solid fa-gear home-card-icon"></i>
                 </div>
             </section>
         </main>
@@ -155,18 +261,21 @@
             </header>
 
             <section class="dashboard-stats-row">
-                <div class="dashboard-card">
-                    <h3>Total Appointment</h3>
-                    <div class="dashboard-card-placeholder"></div>
+                <div class="dashboard-card-placeholder">
+                    <h3>Total Appointments</h3>
+                    <span id="main-total-appointments">0</span>
                 </div>
-                <div class="dashboard-card">
-                    <h3>Total Patient</h3>
-                    <div class="dashboard-card-placeholder"></div>
+
+                <div class="dashboard-card-placeholder">
+                    <h3>Total Patients</h3>
+                    <span id="main-total-patients">0</span>
                 </div>
-                <div class="dashboard-card">
-                    <h3>Total Doctor</h3>
-                    <div class="dashboard-card-placeholder"></div>
+
+                <div class="dashboard-card-placeholder">
+                    <h3>Total Doctors</h3>
+                    <span id="main-total-doctors">0</span>
                 </div>
+
             </section>
 
             <section class="dashboard-progress">
@@ -183,8 +292,36 @@
                 </header>
 
                 <section class="patient-dashboard-progress">
-                    <h3>Total Patient</h3>
-                    <div class="patient-dashboard-progress-placeholder"></div>
+                    <div class="patient-dashboard-progress-placeholder">
+
+                        <form id="add-patient-form">
+                            <input type="text" id="patient-firstname" placeholder="First Name" required>
+                            <input type="text" id="patient-lastname" placeholder="Last Name" required>
+                            <input type="email" id="patient-email" placeholder="Email" required>
+                            <button type="submit">Add Patient</button>
+
+                            <input type="text" id="search-input" placeholder="Search Patient">
+                            <button id="search-btn">Find</button>
+                            <button id="reset-btn">Reset</button>
+
+                        </form>
+                        <div class="table-container">
+                            <table border="1">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>Date Recorded</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patients-list">
+                                    <!-- Patients will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
             </main>
         </section>
@@ -192,13 +329,62 @@
         <!--DOCTOR DASHBOARD-->
         <section class="doctor-dashboard-page" id="doctordashboardPage" style="display: none;">
             <main class="doctor-dashboard-main">
-                <header class="doctor-dashboard-top-bar">
-                    <h1>Doctor Dashboard</h1>
-                </header>
 
+                <!-- PROGRESS / STATS -->
                 <section class="doctor-dashboard-progress">
-                    <h3>Total Doctor</h3>
-                    <div class="doctor-dashboard-progress-placeholder"></div>
+
+                    <div class="doctor-progress-card">
+                        <h3>Total Patients</h3>
+                        <span id="doctor-total-patients">0</span>
+                    </div>
+
+                    <div class="doctor-progress-card">
+                        <h3>Today's Appointments</h3>
+                        <span id="doctor-today-appointments">0</span>
+                    </div>
+
+                    <div class="doctor-progress-card">
+                        <h3>Pending Requests</h3>
+                        <span id="doctor-pending-requests">0</span>
+                    </div>
+
+                </section>
+
+                <!-- MAIN CONTENT -->
+                <section class="doctor-dashboard-content">
+
+                    <!-- PATIENT LIST -->
+                    <div class="doctor-dashboard-box">
+                        <h2>Assigned Patients</h2>
+
+                        <!-- QUICK ACTIONS -->
+                        <button class="btn-primary" id="viewAppointmentsBtn">
+                            View Appointments
+                        </button>
+                        <button class="btn-secondary" id="createPrescriptionBtn">
+                            Create Prescription
+                        </button>
+
+                        <!-- SEARCH -->
+                        <input type="text" id="search-input" placeholder="Search Patient">
+                        <button id="search-btn" class="btn-primary-search">Search</button>
+                        <button id="reset-btn" class="btn-secondary-search">Reset</button>
+
+                        <table class="doctor-dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Date Added</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctor-patient-list">
+                                <!-- JS injects rows here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
             </main>
         </section>
@@ -222,14 +408,20 @@
                 <h3>Appointments</h3>
             </header>
 
-            <section class="appointment-action-row">
-                <button class="add-appointment-btn">+ Add Appointment</button>
-            </section>
-
             <section class="appointment-content-row">
                 <div class="appointment-card">
-                    <h3>Total Patient</h3>
-                    <div class="appointment-card-placeholder"></div>
+                    <div class="appointment-card-placeholder">
+                        <form id="add-appointment-form">
+                            <input type="text" id="patient-firstname" placeholder="First Name" required>
+                            <input type="text" id="patient-lastname" placeholder="Last Name" required>
+                            <input type="email" id="patient-email" placeholder="Email" required>
+
+                            <input type="text" id="search-input" placeholder="Search Patient">
+                            <button id="search-btn">Find</button>
+                            <button id="reset-btn">Reset</button>
+                            <button id="add-appointment-btn">+ Add Appointment</button>
+                        </form>
+                    </div>
                 </div>
             </section>
         </main>
@@ -243,7 +435,8 @@
             <nav>
                 <div class="home-nav-item" id="homeBtnSett"><i class="fa-solid fa-house"></i> Home</div>
                 <div class="home-nav-item" id="dashBtnSett"><i class="fa-solid fa-chart-line"></i> Dashboard</div>
-                <div class="home-nav-item" id="appBtnSett"><i class="fa-solid fa-calendar-days"></i> Appointment</div>
+                <div class="home-nav-item" id="appBtnSett"><i class="fa-solid fa-calendar-days"></i> Appointment
+                </div>
                 <div class="home-nav-item active"><i class="fa-solid fa-gear"></i> Settings</div>
             </nav>
         </aside>
@@ -280,6 +473,12 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Custom Alert Box -->
+    <div id="customAlert" class="custom-alert">
+        <span id="customAlertMessage"></span>
+        <button id="customAlertClose">&times;</button>
     </div>
 
     <script type="module" src="Js.js"></script>
