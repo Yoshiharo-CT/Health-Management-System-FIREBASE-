@@ -132,29 +132,6 @@ async function redirectDashboard(user) {
 }
 
 // ==============================
-// REMEMBER USER (AFTER LOGIN)
-// ==============================
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        container.style.display = 'none';
-
-        const lastPage = localStorage.getItem('currentPage') || 'homePage';
-
-        if (allPages[lastPage]) {
-            showPage(lastPage);
-        } else {
-            showPage('homePage');
-        }
-
-        await redirectDashboard(user);
-
-    } else {
-        container.style.display = 'block';
-    }
-}); 
-
-
-// ==============================
 // REGISTER USER
 // ==============================
 registerForm.addEventListener('submit', async (e) => {
@@ -240,7 +217,6 @@ loginForm.addEventListener('submit', async (e) => {
     const userAnswer = parseInt(document.getElementById("captcha-answer").value, 10);
     const num1 = parseInt(document.getElementById("num1").value, 10);
     const num2 = parseInt(document.getElementById("num2").value, 10);
-    const feedbackEl = document.getElementById("feedback");
 
     if (userAnswer !== num1 + num2) {
         showCustomAlert("Incorrect CAPTCHA. Please try again.");
@@ -727,3 +703,174 @@ async function loadDoctorPatients() {
     }
 }
 
+// ===================
+// APPOINTMENT
+// ===================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const appointmentForm = document.getElementById("add-appointment-form");
+    const appointmentList = document.getElementById("appointment-list");
+
+    const totalAppointmentsEl = document.getElementById("total-appointments");
+
+    const searchInput = document.getElementById("appointment-search-input");
+    const searchBtn = document.getElementById("appointment-search-btn");
+    const resetBtn = document.getElementById("appointment-reset-btn");
+
+    // ==============================
+    // UPDATE TOTAL COUNT
+    // ==============================
+    function updateTotalAppointments(count) {
+        if (totalAppointmentsEl) {
+            totalAppointmentsEl.textContent = count;
+        }
+    }
+
+    // ==============================
+    // RENDER APPOINTMENT
+    // ==============================
+    function renderAppointment(data, index) {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${index}</td>
+            <td>${data.firstname}</td>
+            <td>${data.lastname}</td>
+            <td>${data.email}</td>
+            <td>${data.date}</td>
+            <td>${data.status}</td>
+        `;
+
+        appointmentList.appendChild(tr);
+    }
+
+    // ==============================
+    // LOAD APPOINTMENTS
+    // ==============================
+    async function loadAppointments() {
+
+        appointmentList.innerHTML = "";
+
+        const querySnapshot = await getDocs(collection(db, "appointments"));
+
+        const appointments = [];
+
+        querySnapshot.forEach((docSnap) => {
+            appointments.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        // Sort by newest
+        appointments.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        appointments.forEach((appt, index) => {
+            renderAppointment(appt, index + 1);
+        });
+
+        updateTotalAppointments(appointments.length);
+    }
+
+    // ==============================
+    // ADD APPOINTMENT
+    // ==============================
+    appointmentForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const firstname = document.getElementById("appointment-firstname").value.trim();
+        const lastname = document.getElementById("appointment-lastname").value.trim();
+        const email = document.getElementById("appointment-email").value.trim().toLowerCase();
+        const date = document.getElementById("appointment-date").value;
+        const status = document.getElementById("appointment-status").value;
+
+        if (!firstname || !lastname || !email || !date || !status) {
+            showCustomAlert("Please fill all appointment fields.");
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "appointments"), {
+                firstname,
+                lastname,
+                email,
+                date,
+                status,
+                createdAt: new Date()
+            });
+
+            showCustomAlert("Appointment added successfully!");
+            appointmentForm.reset();
+            loadAppointments();
+
+        } catch (error) {
+            console.error("Error adding appointment:", error);
+            showCustomAlert("Error adding appointment.");
+        }
+    });
+
+    // ==============================
+    // SEARCH APPOINTMENT
+    // ==============================
+    searchBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const searchValue = searchInput.value.trim().toLowerCase();
+
+        if (!searchValue) {
+            showCustomAlert("Enter something to search.");
+            return;
+        }
+
+        appointmentList.innerHTML = "";
+
+        const querySnapshot = await getDocs(collection(db, "appointments"));
+
+        const filtered = [];
+
+        querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+
+            if (
+                data.firstname.toLowerCase().includes(searchValue) ||
+                data.lastname.toLowerCase().includes(searchValue) ||
+                data.email.toLowerCase().includes(searchValue) ||
+                data.status.toLowerCase().includes(searchValue)
+            ) {
+                filtered.push(data);
+            }
+        });
+
+        if (filtered.length === 0) {
+            appointmentList.innerHTML = `<tr><td colspan="6">No appointment found.</td></tr>`;
+            return;
+        }
+
+        filtered.forEach((appt, index) => {
+            renderAppointment(appt, index + 1);
+        });
+
+        updateTotalAppointments(filtered.length);
+    });
+
+    // ==============================
+    // RESET SEARCH
+    // ==============================
+    resetBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        searchInput.value = "";
+        loadAppointments();
+    });
+
+    // ==============================
+    // LOAD WHEN APPOINTMENT PAGE OPENED
+    // ==============================
+    document.querySelectorAll('.home-nav-item').forEach(btn => {
+        btn.addEventListener('click', function () {
+            if (this.innerText.toLowerCase().includes("appointment")) {
+                loadAppointments();
+            }
+        });
+    });
+});

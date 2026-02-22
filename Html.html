@@ -403,26 +403,102 @@
             </nav>
         </aside>
 
+        <!-- Main Content -->
         <main class="appointment-main">
-            <header class="appointment-top-bar">
-                <h3>Appointments</h3>
-            </header>
 
+            <!-- Stats Section -->
+            <section class="appointment-stats">
+                <div class="stat-card">
+                    <h4>Total Appointments</h4>
+                    <p id="total-count">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Today's Appointments</h4>
+                    <p id="today-count">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Pending</h4>
+                    <p id="pending-count">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Completed</h4>
+                    <p id="completed-count">0</p>
+                </div>
+            </section>
+
+            <!-- Appointment Form -->
             <section class="appointment-content-row">
                 <div class="appointment-card">
-                    <div class="appointment-card-placeholder">
-                        <form id="add-appointment-form">
+                    <form id="add-appointment-form">
+
+                        <h3>Add Appointment</h3>
+
+                        <div class="form-row">
                             <input type="text" id="patient-firstname" placeholder="First Name" required>
                             <input type="text" id="patient-lastname" placeholder="Last Name" required>
-                            <input type="email" id="patient-email" placeholder="Email" required>
+                        </div>
 
+                        <div class="form-row">
+                            <input type="email" id="patient-email" placeholder="Email" required>
+                            <input type="tel" id="patient-contact" placeholder="Contact No." required
+                                pattern="[0-9]{10}" title="Enter 10-digit number">
+                        </div>
+
+                        <div class="form-row">
+                            <input type="date" id="appointment-date" required>
+                            <input type="time" id="appointment-time" required>
+                        </div>
+
+                        <div class="form-row">
+                            <select id="doctor-select" required>
+                                <option value="">Select Doctor</option>
+                                <option>Dr. Smith</option>
+                                <option>Dr. Johnson</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <button type="submit" class="primary-btn">
+                                + Add Appointment
+                            </button>
+                        </div>
+
+                        <hr>
+
+                        <!-- Search Section -->
+                        <div class="form-row">
                             <input type="text" id="search-input" placeholder="Search Patient">
-                            <button id="search-btn">Find</button>
-                            <button id="reset-btn">Reset</button>
-                            <button id="add-appointment-btn">+ Add Appointment</button>
-                        </form>
-                    </div>
+                            <button type="button" id="search-btn">Find</button>
+                            <button type="button" id="reset-btn">Reset</button>
+                        </div>
+
+                    </form>
                 </div>
+            </section>
+
+            <!-- Appointment Table -->
+            <section>
+                <table class="appointment-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Patient Name</th>
+                            <th>Email</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Doctor</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="appointment-list">
+                        <!-- JS Injects Data Here -->
+                    </tbody>
+                </table>
             </section>
         </main>
     </div>
