@@ -365,10 +365,53 @@
                             Create Prescription
                         </button>
 
+                        <!-- PRESCRIPTION SECTION -->
+                        <div id="prescriptionSection">
+                            <h3>Prescriptions</h3>
+
+                            <div class="rx-controls">
+                                <input id="rxSearch" placeholder="Search..." />
+                                <button id="rxSearchBtn">Search</button>
+                                <button id="rxResetBtn">Reset</button>
+                                <button id="rxSortBtn">Sort A–Z</button>
+                                <button id="rxcreatePrescriptionBtn">Create Prescription</button>
+                            </div>
+
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Patient</th>
+                                        <th>Medicine</th>
+                                        <th>Doctor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rxTableBody"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- MODAL -->
+                        <div id="prescriptionModal" class="modal">
+                            <div class="modal-content">
+                                <h3>Create Prescription</h3>
+                                <form id="prescriptionForm">
+                                    <input id="rxPatientName" placeholder="Patient Name" required>
+                                    <input id="rxPatientEmail" placeholder="Patient Email" required>
+                                    <textarea id="rxMedicine" placeholder="Medicine Details" required></textarea>
+                                    <input id="rxDoctor" placeholder="Doctor Name" required>
+
+                                    <div class="modal-buttons">
+                                        <button type="submit" class="save-btn">Save</button>
+                                        <button type="button" id="closeRxModal" class="cancel-btn">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
                         <!-- SEARCH -->
                         <input type="text" id="search-input" placeholder="Search Patient">
-                        <button id="search-btn" class="btn-primary-search">Search</button>
-                        <button id="reset-btn" class="btn-secondary-search">Reset</button>
+                        <button id="rxsearch-btn" class="btn-primary-search">Search</button>
+                        <button id="rxreset-btn" class="btn-secondary-search">Reset</button>
 
                         <table class="doctor-dashboard-table">
                             <thead>
@@ -452,21 +495,15 @@
                             <input type="time" id="appointment-time" required>
                         </div>
 
-                        <div class="form-row">
-                            <select id="doctor-select" required>
-                                <option value="">Select Doctor</option>
-                                <option>Dr. Smith</option>
-                                <option>Dr. Johnson</option>
-                            </select>
-                        </div>
+                        <!-- DOCTOR SELECTION -->
+                        <select id="rxDoctorSelect" required>
+                            <option value="">Select Doctor</option>
+                            <option value="">Dr. Test</option>
+                        </select>
 
                         <div class="form-row">
-                            <button type="submit" class="primary-btn">
-                                + Add Appointment
-                            </button>
+                            <button type="submit" class="primary-btn">+ Add Appointment</button>
                         </div>
-
-                        <hr>
 
                         <!-- Search Section -->
                         <div class="form-row">
@@ -487,8 +524,7 @@
                             <th>#</th>
                             <th>Patient Name</th>
                             <th>Email</th>
-                            <th>Date</th>
-                            <th>Time</th>
+                            <th>Date/ Time</th>
                             <th>Doctor</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -557,6 +593,12 @@
         <button id="customAlertClose">&times;</button>
     </div>
 
+    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            emailjs.init('SIVcava9SobqWt4T7');
+        })();
+    </script>
     <script type="module" src="Js.js"></script>
     </div>
 </body>

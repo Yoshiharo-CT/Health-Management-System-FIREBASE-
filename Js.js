@@ -34,7 +34,7 @@ import {
     signInWithEmailAndPassword,
     sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, addDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, addDoc, getDocs, collection, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBFyEuwRF0SBfF9FLqjGON8J-rSh1FeyT8",
@@ -194,7 +194,6 @@ function generateQuestion() {
     const num1Input = document.getElementById('num1');
     const num2Input = document.getElementById('num2');
     const answerInput = document.getElementById('captcha-answer');
-    const feedbackEl = document.getElementById('feedback');
 
     num1 = Math.floor(Math.random() * 50) + 1;
     num2 = Math.floor(Math.random() * 50) + 1;
@@ -537,17 +536,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==============================
-    // LOAD WHEN PATIENT DASHBOARD CLICKED
-    // ==============================
-    dashboardHolder_1.addEventListener('click', () => {
-        dashboardMain.style.display = 'none';
-        allPages.patientDashboardPage.style.display = 'block';
-        allPages.doctorDashboardPage.style.display = 'none';
-
-        loadUsers();
-    });
-
-    // ==============================
     // SEARCH & RESET FUNCTION
     // ==============================
 
@@ -707,7 +695,7 @@ async function loadDoctorPatients() {
 // APPOINTMENT
 // ===================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
     const appointmentForm = document.getElementById("add-appointment-form");
     const appointmentList = document.getElementById("appointment-list");
@@ -728,22 +716,169 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==============================
-    // RENDER APPOINTMENT
+    // HANDLE APPOINTMENT FORM SUBMISSION
     // ==============================
-    function renderAppointment(data, index) {
+    document.addEventListener("DOMContentLoaded", async () => {
 
-        const tr = document.createElement("tr");
+        const rxappointmentForm = document.getElementById("add-appointment-form");
+        const rxDoctorSelect = document.getElementById("rxDoctorSelect");
+        let doctors = [];
 
-        tr.innerHTML = `
-            <td>${index}</td>
-            <td>${data.firstname}</td>
-            <td>${data.lastname}</td>
-            <td>${data.email}</td>
-            <td>${data.date}</td>
-            <td>${data.status}</td>
-        `;
+        // ==============================
+        // LOAD DOCTORS INTO DROPDOWN
+        // ==============================
+        async function populateDoctorDropdown() {
+            rxDoctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+            doctors = [];
 
-        appointmentList.appendChild(tr);
+            try {
+                const usersRef = collection(db, "users");
+                const doctorQuery = query(usersRef, where("role", "==", "doctor"));
+                const querySnapshot = await getDocs(doctorQuery);
+
+                querySnapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const fullName = `${data.firstname} ${data.lastname}`;
+
+                    const option = document.createElement("option");
+                    option.value = docSnap.id;
+                    option.textContent = fullName;
+
+                    rxDoctorSelect.appendChild(option);
+                    doctors.push({ id: docSnap.id, name: fullName });
+                });
+
+                // ✅ Manual Test Doctor
+                const testOption = document.createElement("option");
+                testOption.value = "manual_test_doctor";
+                testOption.textContent = "Dr. Test Doctor (Manual)";
+                rxDoctorSelect.appendChild(testOption);
+
+            } catch (error) {
+                console.error("Error loading doctors:", error);
+            }
+        }
+
+        await populateDoctorDropdown(); // IMPORTANT
+
+        // ==============================
+        // SUBMIT FORM
+        // ==============================
+        rxappointmentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const firstName = document.getElementById("patient-firstname").value.trim();
+            const lastName = document.getElementById("patient-lastname").value.trim();
+            const email = document.getElementById("patient-email").value.trim();
+            const contact = document.getElementById("patient-contact").value.trim();
+            const date = document.getElementById("appointment-date").value;
+            const time = document.getElementById("appointment-time").value;
+            const selectedDoctorId = rxDoctorSelect.value;
+
+            if (!selectedDoctorId) {
+                alert("Please select a doctor!");
+                return;
+            }
+
+            const selectedDoctor =
+                doctors.find(doc => doc.id === selectedDoctorId)?.name
+                || "Dr. Test";
+
+            try {
+
+                // 🔥 SAVE TO FIRESTORE
+                await addDoc(collection(db, "appointments"), {
+                    firstname: firstName,
+                    lastname: lastName,
+                    email: email,
+                    contact: contact,
+                    date: date,
+                    time: time,
+                    doctorId: selectedDoctorId,
+                    doctorName: selectedDoctor,
+                    status: "Pending",
+                    createdAt: serverTimestamp()
+                });
+
+                const rowNumber =
+                    document.getElementById('appointment-list').children.length + 1;
+
+                // ✅ ADD TO TABLE IMMEDIATELY
+                renderAppointment({
+                    firstname: firstName,
+                    lastname: lastName,
+                    email: email,
+                    contact: contact,
+                    date: date,
+                    time: time,
+                    doctorName: selectedDoctor
+                }, rowNumber);
+
+                rxappointmentForm.reset();
+                rxDoctorSelect.selectedIndex = 0;
+
+                showCustomAlert("Appointment added successfully!");
+
+            } catch (error) {
+                console.error("Error adding appointment:", error);
+                showCustomAlert("Error saving appointment.");
+            }
+        });
+
+    });
+
+    // ==============================
+    // RENDER APPOINTMENT FUNCTION
+    // ==============================
+    function renderAppointment(appointmentData, rowNumber) {
+
+        const tr = document.createElement('tr');
+
+        const tdNumber = document.createElement('td');
+        const tdName = document.createElement('td');
+        const tdEmail = document.createElement('td');
+        const tdDate_Time = document.createElement('td');
+        const tdDoctor = document.createElement('td');
+        const tdStatus = document.createElement('td');
+        const tdActions = document.createElement('td');
+
+        tdNumber.textContent = rowNumber;
+        tdName.textContent = `${appointmentData.firstname} ${appointmentData.lastname}`;
+        tdEmail.textContent = appointmentData.email;
+
+        // ✅ Combine selected date + time
+        if (appointmentData.date && appointmentData.time) {
+            const dateObj = new Date(`${appointmentData.date}T${appointmentData.time}`);
+
+            tdDate_Time.textContent = dateObj.toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true
+            });
+        } else {
+            tdDate_Time.textContent = "N/A";
+        }
+
+        tdDoctor.textContent = appointmentData.doctorName || "N/A";
+        tdStatus.textContent = "Pending";
+
+        tdActions.innerHTML = `
+        <button class="btn-edit">Edit</button>
+        <button class="btn-delete">Delete</button>
+    `;
+
+        tr.appendChild(tdNumber);
+        tr.appendChild(tdName);
+        tr.appendChild(tdEmail);
+        tr.appendChild(tdDate_Time);
+        tr.appendChild(tdDoctor);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdActions);
+
+        document.getElementById('appointment-list').appendChild(tr);
     }
 
     // ==============================
@@ -774,43 +909,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==============================
-    // ADD APPOINTMENT
-    // ==============================
-    appointmentForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const firstname = document.getElementById("appointment-firstname").value.trim();
-        const lastname = document.getElementById("appointment-lastname").value.trim();
-        const email = document.getElementById("appointment-email").value.trim().toLowerCase();
-        const date = document.getElementById("appointment-date").value;
-        const status = document.getElementById("appointment-status").value;
-
-        if (!firstname || !lastname || !email || !date || !status) {
-            showCustomAlert("Please fill all appointment fields.");
-            return;
-        }
-
-        try {
-            await addDoc(collection(db, "appointments"), {
-                firstname,
-                lastname,
-                email,
-                date,
-                status,
-                createdAt: new Date()
-            });
-
-            showCustomAlert("Appointment added successfully!");
-            appointmentForm.reset();
-            loadAppointments();
-
-        } catch (error) {
-            console.error("Error adding appointment:", error);
-            showCustomAlert("Error adding appointment.");
-        }
-    });
-
-    // ==============================
     // SEARCH APPOINTMENT
     // ==============================
     searchBtn.addEventListener("click", async (e) => {
@@ -825,43 +923,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
         appointmentList.innerHTML = "";
 
-        const querySnapshot = await getDocs(collection(db, "appointments"));
+        try {
+            const querySnapshot = await getDocs(collection(db, "appointments"));
+            const filtered = [];
 
-        const filtered = [];
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                if (
+                    data.firstname.toLowerCase().includes(searchValue) ||
+                    data.lastname.toLowerCase().includes(searchValue) ||
+                    data.email.toLowerCase().includes(searchValue) ||
+                    (data.status && data.status.toLowerCase().includes(searchValue))
+                ) {
+                    filtered.push({ id: docSnap.id, ...data });
+                }
+            });
 
-        querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-
-            if (
-                data.firstname.toLowerCase().includes(searchValue) ||
-                data.lastname.toLowerCase().includes(searchValue) ||
-                data.email.toLowerCase().includes(searchValue) ||
-                data.status.toLowerCase().includes(searchValue)
-            ) {
-                filtered.push(data);
+            if (filtered.length === 0) {
+                appointmentList.innerHTML = `<tr><td colspan="6" style="text-align:center;">No appointment found.</td></tr>`;
+                updateTotalAppointments(0);
+                return;
             }
-        });
 
-        if (filtered.length === 0) {
-            appointmentList.innerHTML = `<tr><td colspan="6">No appointment found.</td></tr>`;
-            return;
+            filtered.forEach((appt, index) => {
+                renderAppointment(appt, index + 1);
+            });
+
+            updateTotalAppointments(filtered.length);
+        } catch (error) {
+            console.error("Error searching appointments:", error);
+            showCustomAlert("Error fetching appointments. Try again.");
         }
-
-        filtered.forEach((appt, index) => {
-            renderAppointment(appt, index + 1);
-        });
-
-        updateTotalAppointments(filtered.length);
     });
 
-    // ==============================
     // RESET SEARCH
-    // ==============================
-    resetBtn.addEventListener("click", (e) => {
-        e.preventDefault();
+    resetBtn.addEventListener("click", async () => {
         searchInput.value = "";
-        loadAppointments();
+        appointmentList.innerHTML = "";
+        const querySnapshot = await getDocs(collection(db, "appointments"));
+        let total = 0;
+        querySnapshot.forEach((docSnap, index) => {
+            renderAppointment(docSnap.data(), index + 1);
+            total++;
+        });
+        updateTotalAppointments(total);
     });
+
+
 
     // ==============================
     // LOAD WHEN APPOINTMENT PAGE OPENED
@@ -874,3 +982,209 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+// ==============================
+// MEDICINE PRESCRIPTION
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+
+    const $ = (sel) => document.querySelector(sel);
+    const STORAGE_KEY = "prescriptions";
+
+    function normalize(v) {
+        return String(v || "").trim().toLowerCase();
+    }
+
+    function getSession() {
+        return JSON.parse(localStorage.getItem("currentUser") || "null");
+    }
+
+    function getAllPrescriptions() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    }
+
+    function saveAllPrescriptions(list) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function getVisiblePrescriptions() {
+        const session = getSession();
+        const all = getAllPrescriptions();
+
+        if (!session) return [];
+
+        if (session.role === "patient") {
+            return all.filter(p =>
+                normalize(p.patientEmail) === normalize(session.email)
+            );
+        }
+        return all;
+    }
+
+    /* ========================= */
+    /* MODAL */
+    /* ========================= */
+
+    function openModal() {
+        const session = getSession();
+
+        if (!session || (session.role !== "doctor" && session.role !== "staff")) {
+            showCustomAlert("Only doctors or staff can create prescriptions.");
+            return;
+        }
+
+        $("#prescriptionModal").style.display = "flex";
+
+        // Auto-fill doctor name
+        if (session.name) {
+            $("#rxDoctor").value = session.name;
+        }
+    }
+
+    function closeModal() {
+        $("#prescriptionModal").style.display = "none";
+        $("#prescriptionForm").reset();
+    }
+
+    /* ========================= */
+    /* RENDER TABLE */
+    /* ========================= */
+
+    function renderTable(data = null) {
+        const tbody = $("#rxTableBody");
+        if (!tbody) return;
+
+        const list = data || getVisiblePrescriptions();
+        tbody.innerHTML = "";
+
+        if (list.length === 0) {
+            tbody.innerHTML =
+                `<tr><td colspan="4" style="text-align:center;">No prescriptions found</td></tr>`;
+            return;
+        }
+
+        list.forEach(rx => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${rx.date}</td>
+                <td>${rx.patientName}</td>
+                <td>${rx.medicine}</td>
+                <td>${rx.doctor}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    /* ========================= */
+    /* SEARCH */
+    /* ========================= */
+
+    function handleSearch() {
+        const value = normalize($("#rxSearch").value);
+        const list = getVisiblePrescriptions();
+
+        const filtered = list.filter(rx =>
+            normalize(rx.patientName).includes(value) ||
+            normalize(rx.medicine).includes(value) ||
+            normalize(rx.doctor).includes(value)
+        );
+
+        renderTable(filtered);
+    }
+
+    /* ========================= */
+    /* SORT */
+    /* ========================= */
+
+    let sortMode = "AZ";
+
+    function handleSort() {
+        sortMode = sortMode === "AZ" ? "ZA" : "AZ";
+
+        $("#rxSortBtn").textContent =
+            sortMode === "AZ" ? "Sort A–Z" : "Sort Z–A";
+
+        const list = [...getVisiblePrescriptions()].sort((a, b) => {
+            const A = normalize(a.patientName);
+            const B = normalize(b.patientName);
+            return sortMode === "AZ"
+                ? A.localeCompare(B)
+                : B.localeCompare(A);
+        });
+
+        renderTable(list);
+    }
+
+    /* ========================= */
+    /* SAVE PRESCRIPTION */
+    /* ========================= */
+
+    $("#prescriptionForm")?.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const newRx = {
+            id: Date.now(),
+            patientName: $("#rxPatientName").value,
+            patientEmail: $("#rxPatientEmail").value,
+            medicine: $("#rxMedicine").value,
+            doctor: $("#rxDoctor").value,
+            date: new Date().toLocaleString()
+        };
+
+        const list = getAllPrescriptions();
+        list.push(newRx);
+        saveAllPrescriptions(list);
+
+        closeModal();
+        renderTable();
+        showCustomAlert("Prescription saved successfully");
+    });
+
+    /* ========================= */
+    /* BUTTON EVENTS */
+    /* ========================= */
+
+    $("#createPrescriptionBtn")?.addEventListener("click", openModal);
+    $("#rxcreatePrescriptionBtn")?.addEventListener("click", openModal);
+    $("#closeRxModal")?.addEventListener("click", closeModal);
+    $("#rxSearchBtn")?.addEventListener("click", handleSearch);
+    $("#rxResetBtn")?.addEventListener("click", () => {
+        $("#rxSearch").value = "";
+        renderTable();
+    });
+    $("#rxSortBtn")?.addEventListener("click", handleSort);
+
+    renderTable();
+
+    createBtn?.addEventListener("click", () => {
+        if (prescriptionSection.style.display === "block") {
+            prescriptionSection.style.display = "none";
+        } else {
+            prescriptionSection.style.display = "block";
+        }
+    });
+});
+
+// ==========================
+// SEND EMAIL FUNCTION 
+// ==========================
+function sendEmail(firstName, lastName, email, date, time) {
+
+    const templateParams = {
+        first_name: firstName,
+        last_name: lastName,
+        to_email: email,
+        appointment_date: date,
+        appointment_time: time
+    };
+
+    emailjs.send("service_j71aiur", "template_gz2refs", templateParams)
+        .then(function (response) {
+            console.log("SUCCESS!", response.status, response.text);
+            showCustomAlert("Appointment email sent successfully!");
+        })
+        .catch(function (error) {
+            console.error("FAILED...", error);
+            showCustomAlert("Email sending failed.");
+        });
+}
